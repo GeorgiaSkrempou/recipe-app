@@ -3,6 +3,8 @@ from mysql.connector import Error
 from dotenv import load_dotenv
 import os # package that interacts with operating system functionality. Needed to interact with environment variables.
 from flask import request, jsonify, Flask
+from recipe import Recipe
+from user import Users
 
 app = Flask(__name__) #creates a flask app 
 app.config["DEBUG"] = True
@@ -48,7 +50,7 @@ def recipes_all():
 
 # route to add recipes
 @app.route('/api/recipes', methods=['POST'])
-def recipe_add():
+def insert_recipe():
 
     recipe_info = request.json
     if not recipe_info:
@@ -62,17 +64,13 @@ def recipe_add():
 
     values_acc(recipe_portions)
 
-    query = """
-    INSERT INTO recipes (title, portions, ingredients, steps, filters) VALUES (%s, %s, %s, %s, %s)
-    """
+    (cursor, connection) = db_connection()
 
     values=(recipe_title, recipe_portions, recipe_ingredients, recipe_steps, recipe_filters)
 
-    (cursor, connection) = db_connection()
-    cursor.execute(query, values)
-
-    connection.commit()
-    
+    # insert the recipe fields
+    Recipe.insert_recipe(values, cursor, connection)
+      
     return ""
 
 
@@ -83,38 +81,27 @@ def recipe_update(recipe_id):
     (cursor, connection) = db_connection()
 
     # make sure the requested id exists in the database
-    query = "select id from recipes where id = %s"
-    cursor.execute(query, (recipe_id,))
-    selected_id = cursor.fetchone()
-    if not selected_id:
-        return "", 404
+    recipe = Recipe.get_by_id(recipe_id, cursor)
+    if not recipe:
+        return "", 400
 
     # make sure the request contains data
     recipe_info = request.json
     if not recipe_info:
         return "", 400
 
-    recipe_title = recipe_info['title']
-    recipe_portions = recipe_info['portions']
-    recipe_ingredients = recipe_info['ingredients']
-    recipe_steps = recipe_info['steps']
-    recipe_filters = recipe_info['filters']
+    recipe_title = recipe_info["title"] if "title" in recipe_info else recipe["title"]
+    recipe_portions = recipe_info["portions"] if "portions" in recipe_info else recipe["portions"]
+    recipe_ingredients = recipe_info["ingredients"] if "ingredients" in recipe_info else recipe["ingredients"]
+    recipe_steps = recipe_info["steps"] if "steps" in recipe_info else recipe["steps"]
+    recipe_filters = recipe_info["filters"] if "filters" in recipe_info else recipe["filters"]
+    
+    values = (recipe_title, recipe_portions, recipe_ingredients, recipe_steps, recipe_filters, recipe_id)
 
     values_acc(recipe_portions)
 
-    query = """update recipes set 
-    title = %s, 
-    portions = %s, 
-    ingredients = %s, 
-    steps = %s, 
-    filters = %s  
-    where id = %s;"""
-
-    values = (recipe_title, recipe_portions, recipe_ingredients, recipe_steps, recipe_filters, recipe_id)
-
-    cursor.execute(query, values)
-
-    connection.commit()
+    # update the recipe
+    Recipe.update_recipe(values, cursor, connection)
     
     return ""
 
@@ -125,35 +112,26 @@ def recipe_delete(recipe_id):
     (cursor, connection) = db_connection()
 
     # make sure the requested id exists in the database
-    query = "select id from recipes where id = %s"
-    cursor.execute(query, (recipe_id,))
-    selected_id = cursor.fetchone()
+    recipe = Recipe.get_by_id(recipe_id, cursor)
+    if not recipe:
+        return "", 400
 
-    if not selected_id:
-        return "", 404
-
-    query = "DELETE FROM recipes WHERE id = %s;"
-
-    cursor.execute(query, (recipe_id,))
-    connection.commit()
-    
+    Recipe.delete_recipe(recipe_id, cursor, connection)
+      
     return ""
 
 # route to display all recipes for user X
 @app.route('/api/user/<user_id>/recipes', methods=['GET'])
 def user_recipes_all(user_id):
 
-    (cursor, connection) = db_connection()
+    (cursor, _) = db_connection()
 
     # make sure the requested user id exists in the database
-    query = "SELECT id FROM users WHERE id = %s"
-    cursor.execute(query, (user_id,))
-    selected_id = cursor.fetchone()
+    user = Users.get_by_id(user_id, cursor)
+    if not user:
+        return "", 400
 
-    if not selected_id:
-        return "", 404
-
-    # select all the recipes that belong to the user with X uder id
+    # select all the recipes that belong to the user with X user id
     query = "SELECT * FROM recipes WHERE id IN (SELECT recipe_id FROM user_recipes WHERE user_id = %s)"
 
     cursor.execute(query, (user_id,))
@@ -174,7 +152,7 @@ def user_recipe_delete(user_id, recipe_id):
     selected_id = cursor.fetchone()
 
     if not selected_id:
-        return "", 404
+        return "", 400
 
     query = "DELETE FROM user_recipes WHERE user_id = %s AND recipe_id = %s;"
 
@@ -182,5 +160,34 @@ def user_recipe_delete(user_id, recipe_id):
     connection.commit()
     
     return ""
+
+# route to add recipes to user account
+@app.route('/api/user/<user_id>/recipes/<recipe_id>', methods=['POST'])
+def user_recipe_add(user_id, recipe_id):
+
+    (cursor, connection) = db_connection()
+
+    # make sure the requested id exists in the database
+    recipe = Recipe.get_by_id(recipe_id, cursor)
+    if not recipe:
+        return "", 400
+    
+    
+    # check if the user already owns the recipe
+    query = "SELECT recipe_id FROM user_recipes WHERE user_id = %s AND recipe_id = %s"
+    cursor.execute(query, (user_id, recipe_id))
+    selected_recipe_id = cursor.fetchone()
+        
+    if selected_recipe_id:
+        return jsonify({"message": "You already own this recipe"}), 409
+        
+    # if no conflict exists, enter it into  user_recipes
+    query = "INSERT INTO user_recipes (user_id, recipe_id) VALUES (%s,%s);"
+
+    cursor.execute(query, (user_id, recipe_id))
+    connection.commit()
+    
+    return ""
+
 
 app.run()
