@@ -5,12 +5,18 @@ import os # package that interacts with operating system functionality. Needed t
 from flask import request, jsonify, Flask
 from recipe import Recipe
 from user import Users
+import bcrypt
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+
+load_dotenv() # a function that reads the .env file and stores those variables in os.env and makes them environment variables
 
 app = Flask(__name__) #creates a flask app 
 app.config["DEBUG"] = True
 
-load_dotenv() # a function that reads the .env file and stores those variables in os.env and makes them environment variables
-
+# Setup the Flask-JWT-Extended extension
+app.config["JWT_SECRET_KEY"] = os.environ["JWT_TOKEN"]
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = os.environ["JWT_ACCESS_TOKEN_EXPIRES"]
+jwt = JWTManager(app)
 
 def db_connection():
     try:
@@ -36,9 +42,37 @@ def values_acc(recipe_field):
                 error_message={"message": "Please insert a number"}
                 return jsonify(error_message), 400
 
+@app.route('/api/login', methods=['POST'])
+def login():
+    user_info = request.json
+    if not user_info:
+        return "", 400
+
+    email = user_info['email']
+    password = user_info['password']
+
+    (cursor, _) = db_connection()
+   
+    # return the first entry from the database that matches the supplied email
+    cursor.execute('SELECT id, password FROM users WHERE email = %s', (email,))
+    db_user = cursor.fetchone()
+
+    # if the returned value is None (null) this means that there is no entry with this email in the db
+    if db_user is None:
+        return "", 400
+
+    # otherwise, we compare the supplied password with the hashed password from the db. if they match,
+    # we return the user. otherwise, we return error.
+    
+    if bcrypt.checkpw(str.encode(password), str.encode(db_user['password'])):
+        access_token = create_access_token(identity=db_user["id"])
+        return jsonify({"access_token": access_token})
+
+    return "", 400
 
 # make a get route
 @app.route('/api/recipes/', methods=['GET'])
+@jwt_required()
 def recipes_all():
 
     (cursor, _) = db_connection()
@@ -50,6 +84,7 @@ def recipes_all():
 
 # route to add recipes
 @app.route('/api/recipes', methods=['POST'])
+@jwt_required()
 def insert_recipe():
 
     recipe_info = request.json
@@ -76,6 +111,7 @@ def insert_recipe():
 
 # route to edit recipes
 @app.route('/api/recipes/<recipe_id>', methods=['POST'])
+@jwt_required()
 def recipe_update(recipe_id):
 
     (cursor, connection) = db_connection()
@@ -107,6 +143,7 @@ def recipe_update(recipe_id):
 
 # route to delete recipes
 @app.route('/api/recipes/<recipe_id>', methods=['DELETE'])
+@jwt_required()
 def recipe_delete(recipe_id):
 
     (cursor, connection) = db_connection()
@@ -121,15 +158,17 @@ def recipe_delete(recipe_id):
     return ""
 
 # route to display all recipes for user X
-@app.route('/api/user/<user_id>/recipes', methods=['GET'])
-def user_recipes_all(user_id):
-
+@app.route('/api/user/recipes', methods=['GET'])
+@jwt_required()
+def user_recipes_all():
     (cursor, _) = db_connection()
+
+    user_id = get_jwt_identity()
 
     # make sure the requested user id exists in the database
     user = Users.get_by_id(user_id, cursor)
     if not user:
-        return "", 400
+        return "", 404
 
     # select all the recipes that belong to the user with X user id
     query = "SELECT * FROM recipes WHERE id IN (SELECT recipe_id FROM user_recipes WHERE user_id = %s)"
@@ -141,10 +180,12 @@ def user_recipes_all(user_id):
 
 
 # route to delete recipes from user account
-@app.route('/api/user/<user_id>/recipes/<recipe_id>', methods=['DELETE'])
-def user_recipe_delete(user_id, recipe_id):
+@app.route('/api/user/recipes/<recipe_id>', methods=['DELETE'])
+@jwt_required()
+def user_recipe_delete(recipe_id):
 
     (cursor, connection) = db_connection()
+    user_id = get_jwt_identity()
 
     # make sure the requested id exists in the database
     query = "SELECT id FROM user_recipes WHERE user_id = %s AND recipe_id = %s"
@@ -162,10 +203,12 @@ def user_recipe_delete(user_id, recipe_id):
     return ""
 
 # route to add recipes to user account
-@app.route('/api/user/<user_id>/recipes/<recipe_id>', methods=['POST'])
+@app.route('/api/user/recipes/<recipe_id>', methods=['POST'])
+@jwt_required()
 def user_recipe_add(user_id, recipe_id):
 
     (cursor, connection) = db_connection()
+    user_id = get_jwt_identity()
 
     # make sure the requested id exists in the database
     recipe = Recipe.get_by_id(recipe_id, cursor)
