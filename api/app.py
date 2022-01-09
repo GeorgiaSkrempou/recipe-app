@@ -163,22 +163,22 @@ def user_recipes_all(user_id):
 
 
 # route to delete recipes from user account
-@app.route('/api/user/<user_id>/recipes/<user_recipe_id>', methods=['DELETE'])
-def user_recipe_delete(user_id, user_recipe_id):
+@app.route('/api/user/<user_id>/recipes/<recipe_id>', methods=['DELETE'])
+def user_recipe_delete(user_id, recipe_id):
 
     (cursor, connection) = db_connection()
 
     # make sure the requested id exists in the database
-    query = "SELECT id FROM user_recipes WHERE user_id = %s AND id = %s"
-    cursor.execute(query, (user_id, user_recipe_id))
+    query = "SELECT id FROM user_recipes WHERE user_id = %s AND recipe_id = %s"
+    cursor.execute(query, (user_id, recipe_id))
     selected_id = cursor.fetchone()
 
     if not selected_id:
         return "", 404
 
-    query = "DELETE FROM user_recipes WHERE user_id = %s AND id = %s;"
+    query = "DELETE FROM user_recipes WHERE user_id = %s AND recipe_id = %s;"
 
-    cursor.execute(query, (user_id, user_recipe_id))
+    cursor.execute(query, (user_id, recipe_id))
     connection.commit()
     
     return ""
