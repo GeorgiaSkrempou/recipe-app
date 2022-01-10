@@ -15,7 +15,7 @@ app.config["DEBUG"] = True
 
 # Setup the Flask-JWT-Extended extension
 app.config["JWT_SECRET_KEY"] = os.environ["JWT_TOKEN"]
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = os.environ["JWT_ACCESS_TOKEN_EXPIRES"]
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = int(os.environ["JWT_ACCESS_TOKEN_EXPIRES"])
 jwt = JWTManager(app)
 
 def db_connection():
@@ -31,8 +31,9 @@ def db_connection():
 
     except Error as e:
         print("Error while connecting to MySQL", e)
+        return None, None, True
         
-    return cursor, connection
+    return cursor, connection, False
 
 def values_acc(recipe_field):
     if type(recipe_field) != float:        
@@ -51,7 +52,10 @@ def login():
     email = user_info['email']
     password = user_info['password']
 
-    (cursor, _) = db_connection()
+    (cursor, _, has_error) = db_connection()
+    if has_error:
+        return "", 500
+
    
     # return the first entry from the database that matches the supplied email
     cursor.execute('SELECT id, password FROM users WHERE email = %s', (email,))
@@ -71,14 +75,19 @@ def login():
     return "", 400
 
 # make a get route
-@app.route('/api/recipes/', methods=['GET'])
+@app.route('/api/recipes', methods=['GET'])
 @jwt_required()
 def recipes_all():
 
-    (cursor, _) = db_connection()
+    (cursor, _, has_error) = db_connection()
+    if has_error:
+        return "", 500
 
     cursor.execute('SELECT * FROM recipes')
     all_recipes = cursor.fetchall()
+    
+    for recipe_entry in all_recipes:
+        recipe_entry["filters"] = recipe_entry["filters"].split(",")
 
     return jsonify(all_recipes)
 
@@ -95,11 +104,13 @@ def insert_recipe():
     recipe_portions = recipe_info['portions']
     recipe_ingredients = recipe_info['ingredients']
     recipe_steps = recipe_info['steps']
-    recipe_filters = recipe_info['filters']
+    recipe_filters = ",".join(recipe_info['filters'])
 
     values_acc(recipe_portions)
 
-    (cursor, connection) = db_connection()
+    (cursor, connection, has_error) = db_connection()
+    if has_error:
+        return "", 500
 
     values=(recipe_title, recipe_portions, recipe_ingredients, recipe_steps, recipe_filters)
 
@@ -114,7 +125,9 @@ def insert_recipe():
 @jwt_required()
 def recipe_update(recipe_id):
 
-    (cursor, connection) = db_connection()
+    (cursor, connection, has_error) = db_connection()
+    if has_error:
+        return "", 500
 
     # make sure the requested id exists in the database
     recipe = Recipe.get_by_id(recipe_id, cursor)
@@ -146,7 +159,9 @@ def recipe_update(recipe_id):
 @jwt_required()
 def recipe_delete(recipe_id):
 
-    (cursor, connection) = db_connection()
+    (cursor, connection, has_error) = db_connection()
+    if has_error:
+        return "", 500
 
     # make sure the requested id exists in the database
     recipe = Recipe.get_by_id(recipe_id, cursor)
@@ -161,7 +176,9 @@ def recipe_delete(recipe_id):
 @app.route('/api/user/recipes', methods=['GET'])
 @jwt_required()
 def user_recipes_all():
-    (cursor, _) = db_connection()
+    (cursor, _, has_error) = db_connection()
+    if has_error:
+        return "", 500
 
     user_id = get_jwt_identity()
 
@@ -184,7 +201,10 @@ def user_recipes_all():
 @jwt_required()
 def user_recipe_delete(recipe_id):
 
-    (cursor, connection) = db_connection()
+    (cursor, connection, has_error) = db_connection()
+    if has_error:
+        return "", 500
+
     user_id = get_jwt_identity()
 
     # make sure the requested id exists in the database
@@ -207,7 +227,10 @@ def user_recipe_delete(recipe_id):
 @jwt_required()
 def user_recipe_add(user_id, recipe_id):
 
-    (cursor, connection) = db_connection()
+    (cursor, connection, has_error) = db_connection()
+    if has_error:
+        return "", 500
+
     user_id = get_jwt_identity()
 
     # make sure the requested id exists in the database
