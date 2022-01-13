@@ -1,0 +1,9 @@
+.sidebar {
+  background-color: $dark;
+  height: 100%;
+  width: 300px;
+
+  .is-active {
+    background-color: darken($dark, 10);
+  }
+}

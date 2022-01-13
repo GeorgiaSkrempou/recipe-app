@@ -24,7 +24,7 @@
       >
         <template #default='{ row }'>
           <el-check-tag
-            v-for='filter in row.filters.split(",")'
+            v-for='filter in row.filters'
             :key='filter'
             :checked='isFilterChecked(filter)'
             class='mx-1'
@@ -62,7 +62,6 @@
     ref,
   } from 'vue';
   import {
-    onBeforeRouteUpdate,
     useRoute,
     useRouter,
   } from 'vue-router';
@@ -102,18 +101,13 @@
           });
       });
 
-      onBeforeRouteUpdate(() => {
-        if (route.query.hasOwnProperty('tag') === false) {
-          visibleRecipes.value = recipes.value;
-        }
-      });
-
       let isFilterChecked = (filter) => {
         return route.query.hasOwnProperty('tag') && route.query.tag === filter;
       };
       const handleFilterChange = (filter) => {
-        if (route.query.hasOwnProperty('tag') && route.query.tag === filter) {
+        if (isFilterChecked(filter)) {
           router.push({ query: {} });
+          visibleRecipes.value = recipes.value;
           return;
         }
         router.push({ query: { tag: filter } });
