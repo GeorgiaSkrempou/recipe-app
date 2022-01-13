@@ -1,0 +1,134 @@
+<template>
+  <div>
+    <el-table
+      v-loading='loading'
+      :data='visibleRecipes.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))'
+      @select='(r) => selectedRecipes.values = [...r]'
+      @select-all='(r) => selectedRecipes.values = [...r]'
+    >
+      <el-table-column
+        type='selection'
+        width='55'
+      />
+      <el-table-column
+        label='Title'
+        prop='title'
+      />
+      <el-table-column
+        label='Serves'
+        prop='portions'
+      />
+      <el-table-column
+        label='Tags'
+        prop='filters'
+      >
+        <template #default='{ row }'>
+          <el-check-tag
+            v-for='filter in row.filters.split(",")'
+            :key='filter'
+            :checked='isFilterChecked(filter)'
+            class='mx-1'
+            effect='dark'
+            @change='handleFilterChange(filter)'
+          >
+            {{ filter }}
+          </el-check-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align='right'>
+        <template #header>
+          <el-input
+            v-model='search'
+            placeholder='Type to search'
+            size='small'
+          />
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+</template>
+
+<script>
+  import {
+    ElCheckTag,
+    ElInput,
+    ElTable,
+    ElTableColumn,
+  } from 'element-plus';
+  import {
+    computed,
+    onMounted,
+    reactive,
+    ref,
+  } from 'vue';
+  import {
+    onBeforeRouteUpdate,
+    useRoute,
+    useRouter,
+  } from 'vue-router';
+  import { useStore } from 'vuex';
+
+  export default {
+    name: 'Recipes',
+    components: {
+      ElTable,
+      ElTableColumn,
+      ElCheckTag,
+      ElInput,
+    },
+    setup() {
+      const store = useStore();
+      const route = useRoute();
+      const router = useRouter();
+
+      let loading = ref(false);
+      let selectedRecipes = reactive([]);
+      let search = ref('');
+
+      let recipes = computed(() => store.getters['recipe/recipes']);
+      let visibleRecipes = ref([]);
+      onMounted(() => {
+        loading.value = true;
+
+        store.dispatch('recipe/getAll')
+          .then(_ => {
+            loading.value = false;
+
+            if (route.query.hasOwnProperty('tag')) {
+              visibleRecipes.value = recipes.value.filter(recipe => recipe.filters.includes(route.query.tag));
+            } else {
+              visibleRecipes.value = recipes.value;
+            }
+          });
+      });
+
+      onBeforeRouteUpdate(() => {
+        if (route.query.hasOwnProperty('tag') === false) {
+          visibleRecipes.value = recipes.value;
+        }
+      });
+
+      let isFilterChecked = (filter) => {
+        return route.query.hasOwnProperty('tag') && route.query.tag === filter;
+      };
+      const handleFilterChange = (filter) => {
+        if (route.query.hasOwnProperty('tag') && route.query.tag === filter) {
+          router.push({ query: {} });
+          return;
+        }
+        router.push({ query: { tag: filter } });
+        visibleRecipes.value = recipes.value.filter(recipe => recipe.filters.includes(filter));
+      };
+
+      return {
+        loading,
+        visibleRecipes,
+        selectedRecipes,
+        search,
+
+        isFilterChecked,
+        handleFilterChange,
+      };
+    },
+  };
+</script>
