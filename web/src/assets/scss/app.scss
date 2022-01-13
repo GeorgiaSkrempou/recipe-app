@@ -1,6 +1,9 @@
+@import 'reset';
 @import 'fonts';
+@import 'variables';
 @import 'utl';
-
+@import 'navbar';
+@import 'sidebar';
 * {
     font-family: 'Nunito', sans-serif;
 

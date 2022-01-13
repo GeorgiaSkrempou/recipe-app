@@ -1,0 +1,43 @@
+$primary: #636f83;
+$secondary: #9da5b1;
+$success: #2eb85c;
+$info: #39f;
+$warning: #f9b115;
+$danger: #e55353;
+$light: #ebedef;
+$dark: #4f5d73;
+
+$--colors: (
+  "primary": (
+    "base": $primary,
+  ),
+  "success": (
+    "base": $success,
+  ),
+  "warning": (
+    "base": $warning,
+  ),
+  "danger": (
+    "base": $danger,
+  ),
+  "error": (
+    "base": $danger,
+  ),
+  "info": (
+    "base": $info,
+  ),
+);
+
+// You should use them in scss, because we calculate it by sass.
+// comment next lines to use default color
+@forward "element-plus/theme-chalk/src/common/var.scss" with
+  (
+    $colors: $--colors,
+    $button-padding-horizontal: ("default": 50px),
+  );
+
+@use "element-plus/theme-chalk/src/index.scss" as *;
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}

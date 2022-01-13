@@ -6,6 +6,7 @@ from flask import request, jsonify, Flask
 from recipe import Recipe
 from user import Users
 import bcrypt
+from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 
 load_dotenv() # a function that reads the .env file and stores those variables in os.env and makes them environment variables
@@ -17,6 +18,7 @@ app.config["DEBUG"] = True
 app.config["JWT_SECRET_KEY"] = os.environ["JWT_TOKEN"]
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = int(os.environ["JWT_ACCESS_TOKEN_EXPIRES"])
 jwt = JWTManager(app)
+CORS(app)
 
 def db_connection():
     try:
