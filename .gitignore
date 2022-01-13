@@ -1,3 +1,4 @@
 .env
 recipes.sql
 __pycache__
+.idea

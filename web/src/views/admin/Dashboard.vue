@@ -1,23 +1,23 @@
 <template>
   <div>
-    <el-container>
-      <el-main>
+    <el-row justify='center'>
+      <el-col :xl='12'>
         <router-view />
-      </el-main>
-    </el-container>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
   import {
-    ElContainer,
-    ElMain,
+    ElCol,
+    ElRow,
   } from 'element-plus';
 
   export default {
     components: {
-      ElContainer,
-      ElMain,
+      ElRow,
+      ElCol,
     },
   };
 </script>
