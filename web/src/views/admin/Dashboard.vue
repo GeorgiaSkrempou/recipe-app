@@ -1,10 +1,5 @@
 <template>
   <el-container>
-    <el-header
-      class='p-0'
-    >
-      <navbar />
-    </el-header>
     <el-container>
       <el-aside>
         <sidebar />

@@ -1,5 +1,5 @@
 <template>
-  <el-container style='background-color: var(--el-bg-color-base)' class='min-vh-100'>
+  <el-container style='background-color: #fff2f238' class='min-vh-100'>
     <router-view />
   </el-container>
 </template>

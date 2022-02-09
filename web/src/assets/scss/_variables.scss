@@ -1,4 +1,4 @@
-$primary: #636f83;
+$primary: #FEC5BB;
 $secondary: #9da5b1;
 $success: #2eb85c;
 $info: #39f;
@@ -40,4 +40,21 @@ $--colors: (
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
+}
+
+.el-menu {
+  --el-menu-hover-bg-color: #ffe2e2 !important;
+}
+
+.el-check-tag, .el-tag {
+  color: #c77878;
+  background-color: #fff2f2 !important;
+
+  &:hover {
+    background-color: darken(#F8EDEB, 5);
+  }
+}
+
+.el-table {
+  --el-table-row-hover-bg-color: #fff2f2;
 }

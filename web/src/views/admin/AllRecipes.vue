@@ -1,50 +1,73 @@
 <template>
   <div>
-    <el-table
-      v-loading='loading'
-      :data='visibleRecipes.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))'
-      @select='(r) => selectedRecipes.values = [...r]'
-      @select-all='(r) => selectedRecipes.values = [...r]'
+    <el-row
+      align='middle'
+      justify='space-between'
     >
-      <el-table-column
-        type='selection'
-        width='55'
-      />
-      <el-table-column
-        label='Title'
-        prop='title'
-      />
-      <el-table-column
-        label='Serves'
-        prop='portions'
-      />
-      <el-table-column
-        label='Tags'
-        prop='filters'
+      <div>
+        <h2>All recipes</h2>
+        <h4>Select recipes to add to your account</h4>
+      </div>
+    </el-row>
+    <el-row
+      align='middle'
+      class='mb-4'
+      justify='space-between'
+    >
+      <el-col
+        :span='4'
       >
-        <template #default='{ row }'>
-          <el-check-tag
-            v-for='filter in row.filters'
-            :key='filter'
-            :checked='isFilterChecked(filter)'
-            class='mx-1'
-            effect='dark'
-            @change='handleFilterChange(filter)'
-          >
-            {{ filter }}
-          </el-check-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align='right'>
-        <template #header>
-          <el-input
-            v-model='search'
-            placeholder='Type to search'
-            size='small'
-          />
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-input
+          v-model='search'
+          placeholder='Search a recipe'
+          cleareable
+        />
+      </el-col>
+      <router-link
+        :to='{name: "admin.recipes.add"}'
+        class='el-button el-button--primary el-button--small btn-link'
+      >
+        Add recipe
+      </router-link>
+    </el-row>
+    <el-card>
+      <el-table
+        v-loading='loading'
+        :data='visibleRecipes.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))'
+        @select='(r) => selectedRecipes.values = [...r]'
+        @select-all='(r) => selectedRecipes.values = [...r]'
+      >
+        <el-table-column
+          type='selection'
+          width='55'
+        />
+        <el-table-column
+          label='Title'
+          prop='title'
+        />
+        <el-table-column
+          label='Serves'
+          prop='portions'
+        />
+        <el-table-column
+          label='Tags'
+          prop='filters'
+        >
+          <template #default='{ row }'>
+            <el-check-tag
+              v-for='filter in row.filters'
+              :key='filter'
+              :checked='isFilterChecked(filter)'
+              class='mx-1'
+              effect='dark'
+              @change='handleFilterChange(filter)'
+            >
+              {{ filter }}
+            </el-check-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
 
@@ -54,6 +77,9 @@
     ElInput,
     ElTable,
     ElTableColumn,
+    ElRow,
+    ElCol,
+    ElCard,
   } from 'element-plus';
   import {
     computed,
@@ -68,12 +94,15 @@
   import { useStore } from 'vuex';
 
   export default {
-    name: 'Recipes',
+    name: 'AllRecipes',
     components: {
       ElTable,
       ElTableColumn,
       ElCheckTag,
       ElInput,
+      ElRow,
+      ElCol,
+      ElCard,
     },
     setup() {
       const store = useStore();
