@@ -86,6 +86,31 @@ const actions = {
         .catch(error => reject(error.response.data));
     });
   },
+  getRecipe: ({ commit }, { recipe }) => {
+    return new Promise((resolve, reject) => {
+      axios({
+        url: `/api/user/recipes/${recipe}`,
+        method: 'POST',
+      })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch(error => reject(error.response.data));
+    });
+  },
+  add: ({ commit }, recipe) => {
+    return new Promise((resolve, reject) => {
+      axios({
+        url: `/api/recipes`,
+        method: 'POST',
+        data: { ...recipe },
+      })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch(error => reject(error.response.data));
+    });
+  },
 };
 
 export default {

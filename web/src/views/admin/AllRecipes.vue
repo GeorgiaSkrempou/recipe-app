@@ -79,6 +79,56 @@
               Add selected ({{ selectedRecipes.values.length }})
             </el-button>
           </template>
+          <template #default='{ row }'>
+            <div class='pt-2'>
+              <router-link
+                :to='{name: "admin.recipes.view", params: {id: row.id}}'
+              >
+                <el-tooltip
+                  class='item'
+                  content='View'
+                  effect='light'
+                  placement='top'
+                >
+                  <el-icon
+                    class='me-2'
+                  >
+                    <icon-view />
+                  </el-icon>
+                </el-tooltip>
+              </router-link>
+              <router-link
+                :to='{name: "admin.recipes.edit", params: {id: row.id}}'
+              >
+                <el-tooltip
+                  class='item'
+                  content='Edit'
+                  effect='light'
+                  placement='top'
+                >
+                  <el-icon
+                    class='me-2'
+                  >
+                    <icon-edit />
+                  </el-icon>
+                </el-tooltip>
+              </router-link>
+              <el-tooltip
+                class='item'
+                content='Delete'
+                effect='light'
+                placement='top'
+                style='cursor: pointer'
+              >
+                <el-icon
+                  :size='20'
+                  @click='selectedRecipes.values = [{...row}];'
+                >
+                  <icon-delete />
+                </el-icon>
+              </el-tooltip>
+            </div>
+          </template>
         </el-table-column>
       </el-table>
     </el-card>
@@ -95,6 +145,8 @@
     ElRow,
     ElTable,
     ElTableColumn,
+    ElTooltip,
+    ElIcon,
   } from 'element-plus';
   import {
     computed,
@@ -119,6 +171,8 @@
       ElCol,
       ElCard,
       ElButton,
+      ElTooltip,
+      ElIcon,
     },
     setup() {
       const store = useStore();
