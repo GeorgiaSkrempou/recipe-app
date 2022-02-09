@@ -227,7 +227,7 @@ def user_recipe_delete(recipe_id):
 # route to add recipes to user account
 @app.route('/api/user/recipes/<recipe_id>', methods=['POST'])
 @jwt_required()
-def user_recipe_add(user_id, recipe_id):
+def user_recipe_add(recipe_id):
 
     (cursor, connection, has_error) = db_connection()
     if has_error:

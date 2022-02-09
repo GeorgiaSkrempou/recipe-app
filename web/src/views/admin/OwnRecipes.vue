@@ -5,8 +5,7 @@
       justify='space-between'
     >
       <div>
-        <h2>All recipes</h2>
-        <h4>Select recipes to add to your account</h4>
+        <h2>Your recipes</h2>
       </div>
     </el-row>
     <el-row
@@ -19,8 +18,8 @@
       >
         <el-input
           v-model='search'
-          cleareable
           placeholder='Search a recipe'
+          cleareable
         />
       </el-col>
       <router-link
@@ -34,8 +33,6 @@
       <el-table
         v-loading='loading'
         :data='visibleRecipes.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))'
-        @select='(r) => { selectedRecipes.values = [...r]; showAddButton = true }'
-        @select-all='(r) => { selectedRecipes.values = [...r]; showAddButton = true }'
       >
         <el-table-column
           type='selection'
@@ -66,20 +63,6 @@
             </el-check-tag>
           </template>
         </el-table-column>
-        <el-table-column
-          align='right'
-        >
-          <template #header>
-            <el-button
-              v-if='showAddButton === true'
-              size='small'
-              type='primary'
-              @click='handleAddRecipes'
-            >
-              Add selected ({{ selectedRecipes.values.length }})
-            </el-button>
-          </template>
-        </el-table-column>
       </el-table>
     </el-card>
   </div>
@@ -87,14 +70,13 @@
 
 <script>
   import {
-    ElButton,
-    ElCard,
     ElCheckTag,
-    ElCol,
     ElInput,
-    ElRow,
     ElTable,
     ElTableColumn,
+    ElRow,
+    ElCol,
+    ElCard,
   } from 'element-plus';
   import {
     computed,
@@ -109,7 +91,7 @@
   import { useStore } from 'vuex';
 
   export default {
-    name: 'AllRecipes',
+    name: 'OwnRecipes',
     components: {
       ElTable,
       ElTableColumn,
@@ -118,7 +100,6 @@
       ElRow,
       ElCol,
       ElCard,
-      ElButton,
     },
     setup() {
       const store = useStore();
@@ -128,15 +109,13 @@
       let loading = ref(false);
       let selectedRecipes = reactive([]);
       let search = ref('');
-      let showAddButton = ref(false);
 
-
-      let recipes = computed(() => store.getters['recipe/recipes']);
+      let recipes = computed(() => store.getters['recipe/ownRecipes']);
       let visibleRecipes = ref([]);
       onMounted(() => {
         loading.value = true;
 
-        store.dispatch('recipe/getAll')
+        store.dispatch('recipe/getOwn')
           .then(_ => {
             loading.value = false;
 
@@ -160,43 +139,15 @@
         router.push({ query: { tag: filter } });
         visibleRecipes.value = recipes.value.filter(recipe => recipe.filters.includes(filter));
       };
-      const handleAddRecipes = () => {
-        const promises = [];
-        selectedRecipes.values.forEach(recipe => {
-          promises.push(
-            store.dispatch('recipe/addToAccount', { recipe: recipe.id }),
-          );
-        });
-
-        Promise.allSettled(promises)
-          .then(r => {
-            let addedRecipesCount = r.filter(promise => promise.status === 'fulfilled').length;
-            if (addedRecipesCount !== 0) {
-              store.commit('global/dispatchToast', {
-                type: 'success',
-                title: `Successfully added ${addedRecipesCount} recipe(s) to your account!`,
-                description: '',
-              });
-            } else {
-              store.commit('global/dispatchToast', {
-                type: 'error',
-                title: `The selected recipes already exist in your account.`,
-                description: '',
-              });
-            }
-          });
-      };
 
       return {
         loading,
         visibleRecipes,
         selectedRecipes,
         search,
-        showAddButton,
 
         isFilterChecked,
         handleFilterChange,
-        handleAddRecipes,
       };
     },
   };
