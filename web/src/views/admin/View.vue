@@ -26,20 +26,20 @@
 </template>
 
 <script>
+  import { QuillEditor } from '@vueup/vue-quill';
   import {
     ElCard,
-    ElForm,
-    ElRow,
-    ElFormItem,
     ElCol,
+    ElForm,
+    ElFormItem,
     ElInput,
+    ElRow,
   } from 'element-plus';
   import {
     computed,
     onMounted,
     ref,
   } from 'vue';
-  import { QuillEditor } from '@vueup/vue-quill';
   import { useRoute } from 'vue-router';
   import { useStore } from 'vuex';
   import Tag from './_includes/Tag.vue';
@@ -47,12 +47,13 @@
   export default {
     name: 'RecipeView',
     components: {
-      ElRow,
       ElCard,
+      ElCol,
       ElForm,
       ElFormItem,
-      ElCol,
       ElInput,
+      ElRow,
+
       QuillEditor,
       Tag,
     },

@@ -141,12 +141,12 @@
     ElCard,
     ElCheckTag,
     ElCol,
+    ElIcon,
     ElInput,
     ElRow,
     ElTable,
     ElTableColumn,
     ElTooltip,
-    ElIcon,
   } from 'element-plus';
   import {
     computed,
@@ -163,16 +163,16 @@
   export default {
     name: 'AllRecipes',
     components: {
-      ElTable,
-      ElTableColumn,
+      ElButton,
+      ElCard,
       ElCheckTag,
+      ElCol,
+      ElIcon,
       ElInput,
       ElRow,
-      ElCol,
-      ElCard,
-      ElButton,
+      ElTable,
+      ElTableColumn,
       ElTooltip,
-      ElIcon,
     },
     setup() {
       const store = useStore();

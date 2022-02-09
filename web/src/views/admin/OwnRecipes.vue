@@ -162,15 +162,15 @@
   export default {
     name: 'OwnRecipes',
     components: {
-      ElTable,
-      ElTableColumn,
+      ElButton,
+      ElCard,
       ElCheckTag,
+      ElCol,
+      ElIcon,
       ElInput,
       ElRow,
-      ElCol,
-      ElCard,
-      ElIcon,
-      ElButton,
+      ElTable,
+      ElTableColumn,
       ElTooltip,
     },
     setup() {

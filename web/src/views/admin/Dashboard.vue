@@ -6,7 +6,7 @@
       </el-aside>
       <el-main>
         <router-view v-slot='{ Component, route }'>
-          <transition name='fade' mode='out-in'>
+          <transition mode='out-in' name='fade'>
             <component :is='Component' :key='route.path' />
           </transition>
         </router-view>
@@ -17,21 +17,21 @@
 
 <script>
   import {
-    ElMain,
     ElAside,
-    ElHeader,
     ElContainer,
+    ElHeader,
+    ElMain,
   } from 'element-plus';
+  import Navbar from './_includes/Navbar.vue';
 
   import Sidebar from './_includes/Sidebar.vue';
-  import Navbar from './_includes/Navbar.vue';
 
   export default {
     components: {
-      ElMain,
       ElAside,
-      ElHeader,
       ElContainer,
+      ElHeader,
+      ElMain,
 
       Sidebar,
       Navbar,

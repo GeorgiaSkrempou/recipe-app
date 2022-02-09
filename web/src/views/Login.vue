@@ -60,13 +60,13 @@
 
   export default {
     components: {
-      ElInput,
-      ElButton,
-      ElForm,
-      ElCard,
-      ElRow,
-      ElFormItem,
       ElAlert,
+      ElButton,
+      ElCard,
+      ElForm,
+      ElFormItem,
+      ElInput,
+      ElRow,
     },
     setup() {
       const store = useStore();

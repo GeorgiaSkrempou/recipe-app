@@ -36,12 +36,13 @@
   export default {
     name: 'RecipeAdd',
     components: {
-      ElRow,
       ElCard,
+      ElCol,
       ElForm,
       ElFormItem,
-      ElCol,
       ElInput,
+      ElRow,
+
       QuillEditor,
       Tag,
       RecipeForm,
