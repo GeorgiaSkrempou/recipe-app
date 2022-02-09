@@ -190,10 +190,15 @@ def user_recipes_all():
         return "", 404
 
     # select all the recipes that belong to the user with X user id
+
     query = "SELECT id, title, portions, filters FROM recipes WHERE id IN (SELECT recipe_id FROM user_recipes WHERE user_id = %s)"
 
     cursor.execute(query, (user_id,))
+
     all_user_recipes = cursor.fetchall()
+    
+    for recipe_entry in all_user_recipes:
+        recipe_entry["filters"] = recipe_entry["filters"].split(",")
 
     return jsonify(all_user_recipes)
 
