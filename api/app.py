@@ -257,5 +257,16 @@ def user_recipe_add(recipe_id):
     
     return ""
 
+# route to return recipe details to display
+@app.route('/api/recipes/<id>', methods=['GET'])
+@jwt_required()
+def user_recipe_return(id):
+    (cursor, _, has_error) = db_connection()
+    if has_error:
+        return "", 500    
+    recipe = Recipe.get_by_id(id, cursor)
+    if not recipe:
+        return "", 400
+    return jsonify(recipe)
 
 app.run()
