@@ -25,6 +25,11 @@ const routes = [
         component: () => import(/* webpackChunkName: 'admin.workouts' */'../views/admin/AllRecipes.vue'),
       },
       {
+        path: '',
+        name: 'admin.recipes.own',
+        component: () => import(/* webpackChunkName: 'admin.workouts' */'../views/admin/OwnRecipes.vue'),
+      },
+      {
         path: '/add',
         name: 'admin.recipes.add',
         component: () => import(/* webpackChunkName: 'admin.workouts' */'../views/admin/Add.vue'),

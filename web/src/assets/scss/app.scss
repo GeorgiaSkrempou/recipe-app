@@ -40,3 +40,11 @@
 .el-tag .el-tag__close {
     color: #914242 !important;
 }
+
+.el-notification__title {
+    --el-notification-title-font-size: 0.8em;
+}
+
+.el-notification {
+    --el-notification-width: 400px;
+}
