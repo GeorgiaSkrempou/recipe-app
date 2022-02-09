@@ -34,8 +34,8 @@
       <el-table
         v-loading='loading'
         :data='visibleRecipes.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))'
-        @select='(r) => { selectedRecipes.values = [...r]; showAddButton = true }'
-        @select-all='(r) => { selectedRecipes.values = [...r]; showAddButton = true }'
+        @select='(r) => selectedRecipes.values = [...r]'
+        @select-all='(r) => selectedRecipes.values = [...r]'
       >
         <el-table-column
           type='selection'
@@ -71,7 +71,7 @@
         >
           <template #header>
             <el-button
-              v-if='showAddButton === true'
+              v-if='selectedRecipes.values.length !== 0'
               size='small'
               type='primary'
               @click='handleAddRecipes'
