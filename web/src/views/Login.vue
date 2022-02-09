@@ -81,7 +81,7 @@
         loading.value = true;
         store.dispatch('user/login', { email: email.value, password: password.value })
           .then(_ => {
-            router.push({ name: 'admin.recipes' });
+            router.push({ name: 'admin.recipes.all' });
           })
           .catch(err => {
             showError.value = true;
