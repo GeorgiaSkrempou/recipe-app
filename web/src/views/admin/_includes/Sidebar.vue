@@ -51,10 +51,6 @@
       const route = useRoute();
       const menuItems = [
         {
-          name: 'Dashboard',
-          icon: 'icon-home',
-          route: 'admin.home',
-        }, {
           name: 'All recipes',
           icon: 'icon-server',
           route: 'admin.recipes.all',
