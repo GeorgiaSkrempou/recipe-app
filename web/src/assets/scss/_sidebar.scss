@@ -1,9 +1,10 @@
 .sidebar {
-  background-color: $dark;
+  background-color: #fff2f2;
   height: 100%;
   width: 300px;
+  font-weight: bold;
 
   .is-active {
-    background-color: darken($dark, 10);
+    background-color: #ffd3d3;
   }
 }

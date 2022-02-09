@@ -1,11 +1,11 @@
 .navbar {
   background-color: $primary;
-  color: $light;
+  color: #fff;
   height: var(--el-header-height);
   align-items: center;
 
   .navbar-brand {
-    background-color: $dark;
+    background-color: $primary;
     width: 300px;
     height: 100%;
     display: flex;

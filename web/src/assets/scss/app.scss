@@ -4,9 +4,39 @@
 @import 'utl';
 @import 'navbar';
 @import 'sidebar';
+@import 'editor';
+
 * {
     font-family: 'Nunito', sans-serif;
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+.el-input-group__prepend, .el-input-group__append {
+    color: var(--el-color-primary);
+}
+
+.el-button--primary.btn-link {
+    --el-button-bg-color: #fff2f2;
+    --el-button-border-color: #FEC5BB;
+    --el-button-hover-bg-color: #fd9a89;
+    --el-button-hover-border-color: #FCD5CE;
+    --el-button-active-bg-color: #fd9a89;
+    --el-button-active-border-color: #FCD5CE;
+
+    text-decoration: none;
+}
+
+.el-button--primary {
+    --el-button-text-color: #c77878 !important;
+}
+
+.el-check-tag.is-checked {
+    background-color: #ffd3d3;
+    color: #914242;
+}
+
+.el-tag .el-tag__close {
+    color: #914242 !important;
 }

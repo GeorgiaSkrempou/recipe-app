@@ -1,12 +1,15 @@
 <template>
   <div class='sidebar'>
+    <div class='navbar-brand'>
+      Recipes
+    </div>
     <el-menu
       :default-active='computeActiveMenuItem'
       :router='true'
-      active-text-color='#fff'
-      background-color='#4f5d73'
+      active-text-color='#914242'
+      background-color='#fff2f2'
       class='border-0'
-      text-color='#9da5b1'
+      text-color='#c77878'
     >
       <el-menu-item
         v-for='(menu, key) in menuItems'
@@ -52,9 +55,13 @@
           icon: 'icon-home',
           route: 'admin.home',
         }, {
-          name: 'Recipes',
+          name: 'All recipes',
           icon: 'icon-server',
-          route: 'admin.recipes',
+          route: 'admin.recipes.all',
+        }, {
+          name: 'Own recipes',
+          icon: 'icon-server',
+          route: 'admin.recipes.own',
         },
       ];
       const parseRoute = (route) => {

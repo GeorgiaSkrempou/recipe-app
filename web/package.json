@@ -8,15 +8,16 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@element-plus/icons": "^0.0.11",
     "core-js": "^3.6.5",
+    "element-plus": "^1.2.0-beta.5",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.2",
-    "element-plus":"^1.2.0-beta.5",
-    "@element-plus/icons": "^0.0.11"
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.0.1",
+    "@vueup/vue-quill": "^1.0.0-beta.7",
     "axios": "^0.24.0",
     "babel-eslint": "^10.1.0",
     "sass": "^1.26.5",
