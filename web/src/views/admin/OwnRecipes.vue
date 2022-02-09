@@ -18,8 +18,8 @@
       >
         <el-input
           v-model='search'
-          placeholder='Search a recipe'
           cleareable
+          placeholder='Search a recipe'
         />
       </el-col>
       <router-link
@@ -33,6 +33,8 @@
       <el-table
         v-loading='loading'
         :data='visibleRecipes.filter((data) => !search || data.title.toLowerCase().includes(search.toLowerCase()))'
+        @select='(r) => selectedRecipes.values = [...r]'
+        @select-all='(r) => selectedRecipes.values = [...r]'
       >
         <el-table-column
           type='selection'
@@ -63,6 +65,70 @@
             </el-check-tag>
           </template>
         </el-table-column>
+        <el-table-column
+          align='right'
+        >
+          <template #header>
+            <el-button
+              v-if='selectedRecipes.values.length !== 0'
+              size='small'
+              type='primary'
+              @click='handleRemoveRecipes'
+            >
+              Remove selected ({{ selectedRecipes.values.length }})
+            </el-button>
+          </template>
+          <template #default='{ row }'>
+            <div class='pt-2'>
+              <router-link
+                :to='{name: "admin.recipes.view", params: {id: row.id}}'
+              >
+                <el-tooltip
+                  class='item'
+                  content='View'
+                  effect='light'
+                  placement='top'
+                >
+                  <el-icon
+                    class='me-2'
+                  >
+                    <icon-view />
+                  </el-icon>
+                </el-tooltip>
+              </router-link>
+              <router-link
+                :to='{name: "admin.recipes.edit", params: {id: row.id}}'
+              >
+                <el-tooltip
+                  class='item'
+                  content='Edit'
+                  effect='light'
+                  placement='top'
+                >
+                  <el-icon
+                    class='me-2'
+                  >
+                    <icon-edit />
+                  </el-icon>
+                </el-tooltip>
+              </router-link>
+              <el-tooltip
+                class='item'
+                content='Delete'
+                effect='light'
+                placement='top'
+                style='cursor: pointer'
+              >
+                <el-icon
+                  :size='20'
+                  @click='selectedRecipes.values = [{...row}];'
+                >
+                  <icon-delete />
+                </el-icon>
+              </el-tooltip>
+            </div>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
   </div>
@@ -70,13 +136,16 @@
 
 <script>
   import {
+    ElButton,
+    ElCard,
     ElCheckTag,
+    ElCol,
+    ElIcon,
     ElInput,
+    ElRow,
     ElTable,
     ElTableColumn,
-    ElRow,
-    ElCol,
-    ElCard,
+    ElTooltip,
   } from 'element-plus';
   import {
     computed,
@@ -100,6 +169,9 @@
       ElRow,
       ElCol,
       ElCard,
+      ElIcon,
+      ElButton,
+      ElTooltip,
     },
     setup() {
       const store = useStore();
@@ -112,7 +184,7 @@
 
       let recipes = computed(() => store.getters['recipe/ownRecipes']);
       let visibleRecipes = ref([]);
-      onMounted(() => {
+      const handleLoadRecipes = () => {
         loading.value = true;
 
         store.dispatch('recipe/getOwn')
@@ -125,6 +197,9 @@
               visibleRecipes.value = recipes.value;
             }
           });
+      };
+      onMounted(() => {
+        handleLoadRecipes();
       });
 
       let isFilterChecked = (filter) => {
@@ -139,6 +214,27 @@
         router.push({ query: { tag: filter } });
         visibleRecipes.value = recipes.value.filter(recipe => recipe.filters.includes(filter));
       };
+      const handleRemoveRecipes = () => {
+        const promises = [];
+        selectedRecipes.values.forEach(recipe => {
+          promises.push(
+            store.dispatch('recipe/removeFromAccount', { recipe: recipe.id }),
+          );
+        });
+
+        Promise.allSettled(promises)
+          .then(r => {
+            let addedRecipesCount = r.filter(promise => promise.status === 'fulfilled').length;
+            if (addedRecipesCount !== 0) {
+              store.commit('global/dispatchToast', {
+                type: 'success',
+                title: `Successfully removed ${addedRecipesCount} recipe(s) to your account!`,
+                description: '',
+              });
+              handleLoadRecipes();
+            }
+          });
+      };
 
       return {
         loading,
@@ -148,6 +244,7 @@
 
         isFilterChecked,
         handleFilterChange,
+        handleRemoveRecipes,
       };
     },
   };

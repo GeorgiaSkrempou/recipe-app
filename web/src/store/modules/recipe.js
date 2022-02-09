@@ -86,6 +86,18 @@ const actions = {
         .catch(error => reject(error.response.data));
     });
   },
+  removeFromAccount: ({ commit }, { recipe }) => {
+    return new Promise((resolve, reject) => {
+      axios({
+        url: `/api/user/recipes/${recipe}`,
+        method: 'DELETE',
+      })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch(error => reject(error.response.data));
+    });
+  },
   getRecipe: ({ commit }, { recipe }) => {
     return new Promise((resolve, reject) => {
       axios({

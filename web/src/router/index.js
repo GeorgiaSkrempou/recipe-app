@@ -20,12 +20,12 @@ const routes = [
     component: () => import(/* webpackChunkName: 'admin.dashboard' */'../views/admin/Dashboard.vue'),
     children: [
       {
-        path: '',
+        path: '/recipes/all',
         name: 'admin.recipes.all',
         component: () => import(/* webpackChunkName: 'admin.workouts' */'../views/admin/AllRecipes.vue'),
       },
       {
-        path: '',
+        path: '/recipes/own',
         name: 'admin.recipes.own',
         component: () => import(/* webpackChunkName: 'admin.workouts' */'../views/admin/OwnRecipes.vue'),
       },
