@@ -7,102 +7,30 @@
     </el-row>
     <el-card
     >
-      <el-form
-        label-position='left'
-      >
-        <el-form-item
-          :error='errors.title'
-          label='Title'
-          label-width='200px'
-          required
-        >
-          <el-col
-            :span='24'
-            class='w-75'
-          >
-            <el-input
-              v-model='recipe.title'
-            />
-          </el-col>
-        </el-form-item>
-        <el-form-item
-          :error='errors.portions'
-          label='Portions'
-          label-width='200px'
-          required
-        >
-          <el-col
-            :span='24'
-            class='w-75'
-          >
-            <el-input
-              v-model='recipe.portions'
-            />
-          </el-col>
-        </el-form-item>
-        <el-form-item
-          :error='errors.ingredients'
-          label='Ingredients'
-          label-width='200px'
-          required
-        >
-          <el-col
-            :span='24'
-            class='w-75'
-          >
-            <quill-editor
-              v-model='recipe.ingredients'
-              theme='snow'
-            />
-          </el-col>
-        </el-form-item>
-        <el-form-item
-          :error='errors.steps'
-          label='Preparation steps'
-          label-width='200px'
-          required
-        >
-          <el-col
-            :span='24'
-            class='w-75'
-          >
-            <quill-editor
-              v-model='recipe.steps'
-              theme='snow'
-            />
-          </el-col>
-        </el-form-item>
-        <el-form-item
-          :error='errors.steps'
-          label='Filters'
-          label-width='200px'
-          required
-        >
-          <el-col
-            :span='24'
-            class='w-75'
-          >
-            <tag
-              :tags='recipe.filters'
-            />
-          </el-col>
-        </el-form-item>
-      </el-form>
+      <recipe-form
+        :errors='errors'
+        :recipe='recipe'
+        btn-label='Add recipe'
+        @form-submit='handleSubmit'
+      />
     </el-card>
   </div>
 </template>
 
 <script>
+  import { QuillEditor } from '@vueup/vue-quill';
   import {
     ElCard,
-    ElForm,
-    ElRow,
-    ElFormItem,
     ElCol,
+    ElForm,
+    ElFormItem,
     ElInput,
+    ElRow,
   } from 'element-plus';
   import { ref } from 'vue';
-  import { QuillEditor } from '@vueup/vue-quill';
+  import { useRouter } from 'vue-router';
+  import { useStore } from 'vuex';
+  import RecipeForm from './_includes/RecipeForm.vue';
   import Tag from './_includes/Tag.vue';
 
   export default {
@@ -116,8 +44,12 @@
       ElInput,
       QuillEditor,
       Tag,
+      RecipeForm,
     },
     setup() {
+      const store = useStore();
+      const router = useRouter();
+
       let recipeObj = {
         title: '',
         portions: '',
@@ -129,9 +61,30 @@
       let recipe = ref({ ...recipeObj });
       let errors = ref({ ...recipeObj });
 
+      const handleSubmit = (recipe) => {
+        store.dispatch('recipe/add', recipe)
+          .then(_ => {
+            store.commit('global/dispatchToast', {
+              type: 'success',
+              title: 'Recipe addedd successfully!',
+              description: '',
+            });
+            return router.push({
+              name: 'admin.recipes.all',
+              params: {
+                reload: true,
+              },
+            });
+          })
+          .catch(err => {
+            errors.value = err;
+          });
+      };
+
       return {
         recipe,
         errors,
+        handleSubmit,
       };
     },
   };
