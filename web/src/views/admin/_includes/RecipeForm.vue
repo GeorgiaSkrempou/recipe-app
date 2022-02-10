@@ -93,6 +93,7 @@
         style='float: right;'
         type='primary'
         :loading='updating'
+        class='btn-link'
         @click='$emit("form-submit", recipe)'
       >
         {{ btnLabel }}
