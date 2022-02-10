@@ -98,13 +98,14 @@ const actions = {
         .catch(error => reject(error.response.data));
     });
   },
-  getRecipe: ({ commit }, { recipe }) => {
+  getRecipe: ({ commit }, recipe) => {
     return new Promise((resolve, reject) => {
       axios({
-        url: `/api/user/recipes/${recipe}`,
-        method: 'POST',
+        url: `/api/recipes/${recipe}`,
+        method: 'GET',
       })
         .then((response) => {
+          commit('setRecipe', response.data);
           resolve(response);
         })
         .catch(error => reject(error.response.data));
