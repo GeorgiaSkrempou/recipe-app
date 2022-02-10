@@ -21,6 +21,48 @@
           {{ recipe.title }}
         </el-col>
       </el-row>
+      <el-divider />
+      <el-row>
+        <el-col
+          :span='4'
+          class='text-muted'
+        >
+          Portions
+        </el-col>
+        <el-col
+          :span='20'
+        >
+          {{ recipe.portions }}
+        </el-col>
+      </el-row>
+      <el-divider />
+      <el-row>
+        <el-col
+          :span='4'
+          class='text-muted'
+        >
+          Ingredients
+        </el-col>
+        <el-col
+          :span='20'
+        >
+          <div v-html='recipe.ingredients' />
+        </el-col>
+      </el-row>
+      <el-divider />
+      <el-row>
+        <el-col
+          :span='4'
+          class='text-muted'
+        >
+          Steps
+        </el-col>
+        <el-col
+          :span='20'
+        >
+          <div v-html='recipe.steps' />
+        </el-col>
+      </el-row>
     </el-card>
   </div>
 </template>
@@ -30,6 +72,7 @@
   import {
     ElCard,
     ElCol,
+    ElDivider,
     ElForm,
     ElFormItem,
     ElInput,
@@ -49,6 +92,7 @@
     components: {
       ElCard,
       ElCol,
+      ElDivider,
       ElForm,
       ElFormItem,
       ElInput,
