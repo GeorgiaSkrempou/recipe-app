@@ -22,7 +22,7 @@ const mutations = {
       type: payload.type,
       title: payload.title,
       message: payload.message,
-      duration: 30000,
+      duration: 3000,
     });
   },
 };
