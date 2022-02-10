@@ -3,15 +3,16 @@
     <el-row
       justify='space-between'
     >
-      <h2>Add new recipe</h2>
+      <h2>Edit recipe</h2>
     </el-row>
     <el-card
     >
       <recipe-form
         :errors='errors'
         :recipe='recipe'
+        :loading='loading'
         :updating='updating'
-        btn-label='Add recipe'
+        btn-label='Edit recipe'
         @form-submit='handleSubmit'
       />
     </el-card>
@@ -28,8 +29,16 @@
     ElInput,
     ElRow,
   } from 'element-plus';
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
+  import {
+    computed,
+    onMounted,
+    ref,
+  } from 'vue';
+  import {
+    onBeforeRouteLeave,
+    useRoute,
+    useRouter,
+  } from 'vue-router';
   import { useStore } from 'vuex';
   import RecipeForm from './_includes/RecipeForm.vue';
   import Tag from './_includes/Tag.vue';
@@ -51,6 +60,7 @@
     setup() {
       const store = useStore();
       const router = useRouter();
+      const route = useRoute();
 
       let recipeObj = {
         title: '',
@@ -60,26 +70,32 @@
         filters: [],
       };
 
-      let recipe = ref({ ...recipeObj });
+      let recipe = computed(() => store.getters['recipe/recipe']);
       let errors = ref({ ...recipeObj });
+      let loading = ref(false);
       let updating = ref(false);
+
+      onMounted(() => {
+        loading.value = true;
+        store.dispatch('recipe/getRecipe', route.params.id)
+          .then(_ => {
+            loading.value = false;
+          })
+      });
+      onBeforeRouteLeave(() => {
+        store.commit('recipe/setRecipe', recipeObj);
+      })
 
       const handleSubmit = (recipe) => {
         updating.value = true;
-        store.dispatch('recipe/add', recipe)
+        store.dispatch('recipe/update', recipe)
           .then(_ => {
             store.commit('global/dispatchToast', {
               type: 'success',
-              title: 'Recipe addedd successfully!',
+              title: 'Recipe updated successfully!',
               description: '',
             });
             updating.value = false;
-            return router.push({
-              name: 'admin.recipes.all',
-              params: {
-                reload: true,
-              },
-            });
           })
           .catch(err => {
             updating.value = false;
@@ -90,6 +106,7 @@
       return {
         recipe,
         errors,
+        loading,
         updating,
 
         handleSubmit,

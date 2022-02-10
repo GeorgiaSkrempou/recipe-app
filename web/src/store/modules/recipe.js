@@ -4,7 +4,7 @@ const defaultRecipeState = () => {
   return {
     recipes: [],
     ownRecipes: [],
-    recipe: [],
+    recipe: {},
     recipeLoaded: false,
     ownRecipesLoaded: false,
   };
@@ -115,6 +115,19 @@ const actions = {
     return new Promise((resolve, reject) => {
       axios({
         url: `/api/recipes`,
+        method: 'POST',
+        data: { ...recipe },
+      })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch(error => reject(error.response.data));
+    });
+  },
+  update: ({ commit }, recipe) => {
+    return new Promise((resolve, reject) => {
+      axios({
+        url: `/api/recipes/${recipe.id}`,
         method: 'POST',
         data: { ...recipe },
       })
