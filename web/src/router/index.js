@@ -42,7 +42,7 @@ const routes = [
       {
         path: '/recipe/:id/edit',
         name: 'admin.recipes.edit',
-        component: () => import(/* webpackChunkName: 'admin.workouts' */'../views/admin/Add.vue'),
+        component: () => import(/* webpackChunkName: 'admin.workouts' */'../views/admin/Edit.vue'),
       },
     ],
   },

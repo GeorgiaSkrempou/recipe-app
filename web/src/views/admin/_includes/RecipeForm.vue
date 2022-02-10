@@ -1,6 +1,6 @@
 <template>
   <el-form
-    v-loading='loading'
+    v-if='loading === false'
     label-position='left'
     status-icon
   >
@@ -46,6 +46,7 @@
       >
         <quill-editor
           v-model:content='recipe.ingredients'
+          :content='recipe.ingredients'
           content-type='html'
           theme='snow'
         />
@@ -63,6 +64,7 @@
       >
         <quill-editor
           v-model:content='recipe.steps'
+          :content='recipe.steps'
           content-type='html'
           theme='snow'
         />
@@ -90,24 +92,37 @@
         size='medium'
         style='float: right;'
         type='primary'
+        :loading='updating'
         @click='$emit("form-submit", recipe)'
       >
         {{ btnLabel }}
       </el-button>
     </el-form-item>
   </el-form>
+  <div
+    v-else
+    class='m-auto'
+    style='width: 1px;'
+  >
+    <el-icon
+      class='loading-data is-loading'
+    >
+      <icon-loading />
+    </el-icon>
+  </div>
 </template>
 
 <script>
   import { QuillEditor } from '@vueup/vue-quill';
   import {
+    ElButton,
     ElCard,
     ElCol,
     ElForm,
     ElFormItem,
+    ElIcon,
     ElInput,
     ElRow,
-    ElButton,
   } from 'element-plus';
   import Tag from './Tag.vue';
 
@@ -117,6 +132,7 @@
       ElCard,
       ElForm,
       ElFormItem,
+      ElIcon,
       ElCol,
       ElInput,
       ElButton,
@@ -134,6 +150,10 @@
         required: true,
       },
       loading: {
+        type: Boolean,
+        required: false,
+      },
+      updating: {
         type: Boolean,
         required: false,
       },
