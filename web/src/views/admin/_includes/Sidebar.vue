@@ -1,7 +1,8 @@
 <template>
   <div class='sidebar'>
     <div class='navbar-brand'>
-      Recipes
+      <img src='/full_logo.svg' class='sidebar-brand-full' alt=''>
+<!--      <img src='/mini_logo.svg' class='sidebar-brand-mini' alt=''>-->
     </div>
     <el-menu
       :default-active='computeActiveMenuItem'
