@@ -1,9 +1,11 @@
+import string
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
 import os # package that interacts with operating system functionality. Needed to interact with environment variables.
 from flask import request, jsonify, Flask
 from recipe import Recipe
+from utils import string_to_list, list_to_string
 from user import Users
 import bcrypt
 from flask_cors import CORS
@@ -88,8 +90,9 @@ def recipes_all():
     cursor.execute('SELECT id, title, portions, filters FROM recipes')
     all_recipes = cursor.fetchall()
     
+    # TODO: put filter join in class
     for recipe_entry in all_recipes:
-        recipe_entry["filters"] = recipe_entry["filters"].split(",")
+        recipe_entry["filters"] = string_to_list(recipe_entry, "filters")
 
     return jsonify(all_recipes)
 
@@ -106,7 +109,7 @@ def insert_recipe():
     recipe_portions = recipe_info['portions']
     recipe_ingredients = recipe_info['ingredients']
     recipe_steps = recipe_info['steps']
-    recipe_filters = ",".join(recipe_info['filters'])
+    recipe_filters = list_to_string(recipe_info, "filters")
 
     values_acc(recipe_portions)
 
@@ -145,8 +148,11 @@ def recipe_update(recipe_id):
     recipe_portions = recipe_info["portions"] if "portions" in recipe_info else recipe["portions"]
     recipe_ingredients = recipe_info["ingredients"] if "ingredients" in recipe_info else recipe["ingredients"]
     recipe_steps = recipe_info["steps"] if "steps" in recipe_info else recipe["steps"]
-    recipe_filters = recipe_info["filters"] if "filters" in recipe_info else recipe["filters"]
-    
+    if "filters" in recipe_info:
+        recipe_filters = list_to_string(recipe_info,"filters")
+    else:
+        recipe_filters = recipe["filters"]
+   
     values = (recipe_title, recipe_portions, recipe_ingredients, recipe_steps, recipe_filters, recipe_id)
 
     values_acc(recipe_portions)
@@ -198,7 +204,7 @@ def user_recipes_all():
     all_user_recipes = cursor.fetchall()
     
     for recipe_entry in all_user_recipes:
-        recipe_entry["filters"] = recipe_entry["filters"].split(",")
+        recipe_entry["filters"] = string_to_list (recipe_entry, "filters")
 
     return jsonify(all_user_recipes)
 
@@ -270,8 +276,12 @@ def user_recipe_return(id):
     if has_error:
         return "", 500    
     recipe = Recipe.get_by_id(id, cursor)
+
     if not recipe:
         return "", 400
+    
+    recipe["filters"] = recipe["filters"].split(",")
     return jsonify(recipe)
+
 
 app.run()
