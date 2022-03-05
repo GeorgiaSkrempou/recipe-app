@@ -16,6 +16,9 @@ class Recipe:
         connection.commit()
 
     def delete_recipe(id, cursor, connection):
+        query = "DELETE FROM user_recipes WHERE recipe_id = %s"
+        cursor.execute(query, (id,))
+        connection.commit()
         query = "DELETE FROM recipes WHERE id = %s;"
         cursor.execute(query, (id,))
         connection.commit()

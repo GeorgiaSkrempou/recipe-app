@@ -175,6 +175,7 @@ def recipe_delete(recipe_id):
     if not recipe:
         return "", 400
 
+
     Recipe.delete_recipe(recipe_id, cursor, connection)
       
     return ""
