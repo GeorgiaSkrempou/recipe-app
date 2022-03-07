@@ -20,8 +20,12 @@
     "@vueup/vue-quill": "^1.0.0-beta.7",
     "axios": "^0.24.0",
     "babel-eslint": "^10.1.0",
+    "filepond": "^4.30.3",
+    "filepond-plugin-file-validate-type": "^1.2.6",
+    "filepond-plugin-image-preview": "^4.6.10",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
-    "vite": "^2.7.11"
+    "vite": "^2.7.11",
+    "vue-filepond": "^7.0.2"
   }
 }

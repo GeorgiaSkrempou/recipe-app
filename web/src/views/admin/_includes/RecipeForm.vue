@@ -71,6 +71,19 @@
       </el-col>
     </el-form-item>
     <el-form-item
+      label='Image'
+      label-width='200px'
+    >
+      <el-col
+        :span='24'
+        class='w-75'
+      >
+        <file-upload
+          :files='recipe.image'
+        />
+      </el-col>
+    </el-form-item>
+    <el-form-item
       :error='errors.steps'
       label='Filters'
       label-width='200px'
@@ -126,6 +139,7 @@
     ElRow,
   } from 'element-plus';
   import Tag from './Tag.vue';
+  import FileUpload from './FileUpload.vue';
 
   export default {
     components: {
@@ -138,6 +152,7 @@
       ElInput,
       ElButton,
 
+      FileUpload,
       QuillEditor,
       Tag,
     },
