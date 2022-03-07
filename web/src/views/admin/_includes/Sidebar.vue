@@ -61,12 +61,8 @@
           route: 'admin.recipes.own',
         },
       ];
-      const parseRoute = (route) => {
-        let splitRoute = route.split('.');
-        return [splitRoute[0], splitRoute[1]].join('.');
-      };
       let computeActiveMenuItem = computed(() => {
-        return menuItems.findIndex((el) => parseRoute(el.route) === parseRoute(route.name)).toString();
+        return menuItems.findIndex((el) => el.route === route.name).toString();
       });
       return {
         menuItems,

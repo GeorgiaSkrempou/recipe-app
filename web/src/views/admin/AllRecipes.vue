@@ -122,7 +122,7 @@
               >
                 <el-icon
                   :size='20'
-                  @click='selectedRecipes.values = [{...row}];'
+                  @click='showDeleteModal = true; selectedRecipe = row'
                 >
                   <icon-delete />
                 </el-icon>
@@ -132,6 +132,32 @@
         </el-table-column>
       </el-table>
     </el-card>
+    <el-dialog
+      v-model='showDeleteModal'
+      destroy-on-close
+      title='Delete recipe'
+      width='20%'
+    >
+      Are you sure you want to delete the selected recipe?
+      <template #footer>
+      <span class='dialog-footer'>
+        <el-button
+          size='medium'
+          @click='showDeleteModal = false'
+        >
+          Cancel
+        </el-button>
+        <el-button
+          :loading='deletingRecipe'
+          size='medium'
+          type='danger'
+          @click='handleDeleteRecipe'
+        >
+          Confirm
+        </el-button>
+      </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -141,6 +167,7 @@
     ElCard,
     ElCheckTag,
     ElCol,
+    ElDialog,
     ElIcon,
     ElInput,
     ElRow,
@@ -167,6 +194,7 @@
       ElCard,
       ElCheckTag,
       ElCol,
+      ElDialog,
       ElIcon,
       ElInput,
       ElRow,
@@ -183,11 +211,13 @@
       let selectedRecipes = reactive([]);
       let search = ref('');
       let showAddButton = ref(false);
-
+      let showDeleteModal = ref(false);
+      let selectedRecipe = ref({});
+      let deletingRecipe = ref(false);
 
       let recipes = computed(() => store.getters['recipe/recipes']);
       let visibleRecipes = ref([]);
-      onMounted(() => {
+      const handleLoadRecipes = () => {
         loading.value = true;
 
         store.dispatch('recipe/getAll')
@@ -200,6 +230,9 @@
               visibleRecipes.value = recipes.value;
             }
           });
+      };
+      onMounted(() => {
+        handleLoadRecipes();
       });
 
       let isFilterChecked = (filter) => {
@@ -240,6 +273,29 @@
             }
           });
       };
+      const handleDeleteRecipe = () => {
+        deletingRecipe.value = true;
+        store.dispatch('recipe/delete', selectedRecipe.value)
+          .then(_ => {
+            store.commit('global/dispatchToast', {
+              type: 'success',
+              title: `Successfully removed "${selectedRecipe.value.title}"`,
+              description: '',
+            });
+          })
+          .catch(err => {
+            store.commit('global/dispatchToast', {
+              type: 'error',
+              title: 'There was an error removing the selected recipe',
+              description: '',
+            });
+          })
+          .finally(_ => {
+            selectedRecipe.value = {};
+            showDeleteModal.value = false;
+            handleLoadRecipes();
+          });
+      };
 
       return {
         loading,
@@ -247,10 +303,14 @@
         selectedRecipes,
         search,
         showAddButton,
+        showDeleteModal,
+        selectedRecipe,
+        deletingRecipe,
 
         isFilterChecked,
         handleFilterChange,
         handleAddRecipes,
+        handleDeleteRecipe,
       };
     },
   };

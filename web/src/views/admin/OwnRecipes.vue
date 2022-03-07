@@ -121,7 +121,7 @@
               >
                 <el-icon
                   :size='20'
-                  @click='selectedRecipes.values = [{...row}];'
+                  @click='showDeleteModal = true; selectedRecipe = row'
                 >
                   <icon-delete />
                 </el-icon>
@@ -131,6 +131,32 @@
         </el-table-column>
       </el-table>
     </el-card>
+    <el-dialog
+      v-model='showDeleteModal'
+      destroy-on-close
+      title='Delete recipe'
+      width='20%'
+    >
+      Are you sure you want to delete the selected recipe?
+      <template #footer>
+      <span class='dialog-footer'>
+        <el-button
+          size='medium'
+          @click='showDeleteModal = false'
+        >
+          Cancel
+        </el-button>
+        <el-button
+          :loading='deletingRecipe'
+          size='medium'
+          type='danger'
+          @click='handleDeleteRecipe'
+        >
+          Confirm
+        </el-button>
+      </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -140,6 +166,7 @@
     ElCard,
     ElCheckTag,
     ElCol,
+    ElDialog,
     ElIcon,
     ElInput,
     ElRow,
@@ -166,6 +193,7 @@
       ElCard,
       ElCheckTag,
       ElCol,
+      ElDialog,
       ElIcon,
       ElInput,
       ElRow,
@@ -181,6 +209,9 @@
       let loading = ref(false);
       let selectedRecipes = reactive([]);
       let search = ref('');
+      let showDeleteModal = ref(false);
+      let selectedRecipe = ref({});
+      let deletingRecipe = ref(false);
 
       let recipes = computed(() => store.getters['recipe/ownRecipes']);
       let visibleRecipes = ref([]);
@@ -235,16 +266,43 @@
             }
           });
       };
+      const handleDeleteRecipe = () => {
+        deletingRecipe.value = true;
+        store.dispatch('recipe/delete', selectedRecipe.value)
+          .then(_ => {
+            store.commit('global/dispatchToast', {
+              type: 'success',
+              title: `Successfully removed "${selectedRecipe.value.title}"`,
+              description: '',
+            });
+          })
+          .catch(err => {
+            store.commit('global/dispatchToast', {
+              type: 'error',
+              title: 'There was an error removing the selected recipe',
+              description: '',
+            });
+          })
+          .finally(_ => {
+            selectedRecipe.value = {};
+            showDeleteModal.value = false;
+            handleLoadRecipes();
+          });
+      };
 
       return {
         loading,
         visibleRecipes,
         selectedRecipes,
         search,
+        showDeleteModal,
+        selectedRecipe,
+        deletingRecipe,
 
         isFilterChecked,
         handleFilterChange,
         handleRemoveRecipes,
+        handleDeleteRecipe,
       };
     },
   };
