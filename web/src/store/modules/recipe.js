@@ -137,6 +137,18 @@ const actions = {
         .catch(error => reject(error.response.data));
     });
   },
+  delete: ({ commit }, recipe) => {
+    return new Promise((resolve, reject) => {
+      axios({
+        url: `/api/recipes/${recipe.id}`,
+        method: 'DELETE',
+      })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch(error => reject(error.response.data));
+    });
+  },
 };
 
 export default {
