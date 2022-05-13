@@ -283,5 +283,5 @@ def user_recipe_return(id):
     recipe["filters"] = recipe["filters"].split(",")
     return jsonify(recipe)
 
-
-app.run()
+if __name__ == '__main__':
+    app.run()

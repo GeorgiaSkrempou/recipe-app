@@ -1,4 +1,4 @@
-const baseURL = 'http://api.recipes.pi/';
+const baseURL = '';
 
 export {
   baseURL,
